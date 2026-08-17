@@ -1,0 +1,15 @@
+.gitignore:
+# Conda
+.env
+.conda
+
+# VS Code
+.vscode/
+
+# Python
+*.pyc
+__pycache__/
+
+# OS
+.DS_Store
+Thumbs.db
