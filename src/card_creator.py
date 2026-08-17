@@ -77,8 +77,8 @@ def create_pdf(cards, output_path):
     c = canvas.Canvas(output_path, pagesize=A4)
     page_width, page_height = A4
     # Layout
-    margin = 15 * mm
-    title_height = 20 * mm
+    margin = 10 * mm
+    title_height = 15 * mm
     grid_area_width = page_width - 2 * margin
     grid_area_height = page_height - 2 * margin - title_height
 
