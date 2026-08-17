@@ -1,8 +1,10 @@
 import os
 import random
+from PIL import Image, ImageOps
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
 
 from constants import IMAGE_FOLDER, OUTPUT_PDF, NUM_CARDS, GRID_SIZE, VALID_EXTS
 
@@ -15,15 +17,15 @@ def extract_winning_lines(grid):
     Extracts all 12 winning lines as sorted tuples from image paths.
     """
     lines = []
-    # 1. Rows
+    # rows
     for row in grid:
         lines.append(tuple(sorted(row)))
-    # 2. Columns
+    # columns
     for col in range(GRID_SIZE):
         lines.append(tuple(sorted([grid[row][col] for row in range(GRID_SIZE)])))
-    # 3. Diagonal 1
+    # diagonal 1
     lines.append(tuple(sorted([grid[i][i] for i in range(GRID_SIZE)])))
-    # 4. Diagonal 2
+    # diagonal 2
     lines.append(tuple(sorted([grid[i][GRID_SIZE - 1 - i] for i in range(GRID_SIZE)])))
     return lines
 
@@ -32,30 +34,47 @@ def generate_unique_cards(all_images, num_cards):
     cards = []
     attempts = 0
     max_attempts = 100000
-
     while len(cards) < num_cards and attempts < max_attempts:
         attempts += 1
         # 25 random images
         selected = random.sample(all_images, GRID_SIZE * GRID_SIZE)
         # 5x5 grid
         grid = [selected[i * GRID_SIZE : (i + 1) * GRID_SIZE] for i in range(GRID_SIZE)]
-        # check winning lines
+        # get winning lines
         lines = extract_winning_lines(grid)
         # check if any of the winning lines have been used
         if any(line in used_winning_lines for line in lines):
             continue
-        # If unique, add to used lines and cards
+        # if unique, add to used lines and cards
         for line in lines:
             used_winning_lines.add(line)
         cards.append(grid)
-
-    print(f"Erfolgreich {len(cards)} einzigartige Bingokarten generiert!")
+    print(f"Successfully generated {len(cards)} unique bingo cards (after {attempts} attempts)!")
     return cards
 
 def create_pdf(cards, output_path):
+    unique_paths = set()
+    for card in cards:
+        for row in card:
+            for img_path in row:
+                unique_paths.add(img_path)
+    # downscale images
+    image_cache = {}
+    for idx, path in enumerate(unique_paths, start=1):
+        try:
+            with Image.open(path) as img:
+                img = ImageOps.exif_transpose(img)
+                img_copy = img.convert("RGB")
+                img_copy.thumbnail((400, 400))
+                image_cache[path] = ImageReader(img_copy)
+        except Exception as e:
+            print(f"Fehler bei Bild {path}: {e}")
+            image_cache[path] = None
+        if idx % 10 == 0 or idx == len(unique_paths):
+            print(f"   -> {idx}/{len(unique_paths)} images prepared...")
+
     c = canvas.Canvas(output_path, pagesize=A4)
     page_width, page_height = A4
-
     # Layout
     margin = 15 * mm
     title_height = 20 * mm
@@ -67,9 +86,8 @@ def create_pdf(cards, output_path):
     start_y = margin + (grid_area_height - cell_size * GRID_SIZE) / 2
 
     for card_idx, card in enumerate(cards, start=1):
-        # Title
         c.setFont("Helvetica-Bold", 24)
-        c.drawCentredString(page_width / 2, page_height - margin - 12 * mm, f"BINGO - Karte #{card_idx}")
+        c.drawCentredString(page_width / 2, page_height - margin - 12 * mm, f"Geburtstagsbingo - Karte #{card_idx}")
 
         # draw 5x5 grid
         for r in range(GRID_SIZE):
@@ -82,18 +100,24 @@ def create_pdf(cards, output_path):
                 c.rect(x, y, cell_size, cell_size)
                 # paste images
                 try:
-                    c.drawImage(img_path, x + 1.5*mm, y + 1.5*mm, width=cell_size - 3*mm, height=cell_size - 3*mm, preserveAspectRatio=True)
+                    cached_img = image_cache.get(img_path)
+                    if cached_img:
+                        c.drawImage(cached_img, x + 1.5*mm, y + 1.5*mm, 
+                                    width=cell_size - 3*mm, height=cell_size - 3*mm, 
+                                    preserveAspectRatio=True)
                 except Exception as e:
-                    print(f"Fehler beim Laden von Bild {img_path}: {e}")
+                    print(f"Error loading image {img_path}: {e}")
+        if card_idx % 10 == 0 or card_idx == len(cards):
+            print(f"   -> page {card_idx}/{len(cards)} created...")
         c.showPage()
     c.save()
-    print(f"PDF gespeichert unter: {output_path}")
+    print(f"PDF saved to: {output_path}")
 
 if __name__ == "__main__":
     images = get_image_paths(IMAGE_FOLDER)
     if len(images) < 25:
-        print("Fehler: Du benötigst mindestens 25 Bilder für ein 5x5 Bingo!")
+        print("Error: at least 25 images required")
     else:
-        print(f"{len(images)} Bilder im Ordner gefunden.")
+        print(f"{len(images)} images found.")
         bingo_cards = generate_unique_cards(images, NUM_CARDS)
         create_pdf(bingo_cards, OUTPUT_PDF)
