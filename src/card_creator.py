@@ -104,8 +104,8 @@ def create_pdf(cards, output_path):
                 try:
                     cached_img = image_cache.get(img_path)
                     if cached_img:
-                        c.drawImage(cached_img, x + 1.5*mm, y + 1.5*mm, 
-                                    width=cell_size - 3*mm, height=cell_size - 3*mm, 
+                        c.drawImage(cached_img, x + 1*mm, y + 1*mm,
+                                    width=cell_size - 2*mm, height=cell_size - 2*mm,
                                     preserveAspectRatio=True)
                 except Exception as e:
                     print(f"Error loading image {img_path}: {e}")
