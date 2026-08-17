@@ -49,7 +49,7 @@ def generate_unique_cards(all_images, num_cards):
         for line in lines:
             used_winning_lines.add(line)
         cards.append(grid)
-    print(f"Successfully generated {len(cards)} unique bingo cards (after {attempts} attempts)!")
+    print(f"Successfully generated {len(cards)} unique bingo cards (after {attempts} attempts).")
     return cards
 
 def create_pdf(cards, output_path):
@@ -60,6 +60,7 @@ def create_pdf(cards, output_path):
                 unique_paths.add(img_path)
     # downscale images
     image_cache = {}
+    print(f"Preparing {len(unique_paths)} unique images for PDF...")
     for idx, path in enumerate(unique_paths, start=1):
         try:
             with Image.open(path) as img:
@@ -85,6 +86,7 @@ def create_pdf(cards, output_path):
     start_x = margin + (grid_area_width - cell_size * GRID_SIZE) / 2
     start_y = margin + (grid_area_height - cell_size * GRID_SIZE) / 2
 
+    print(f"Creating PDF with {len(cards)} cards...")
     for card_idx, card in enumerate(cards, start=1):
         c.setFont("Helvetica-Bold", 24)
         c.drawCentredString(page_width / 2, page_height - margin - 12 * mm, f"Geburtstagsbingo - Karte #{card_idx}")
