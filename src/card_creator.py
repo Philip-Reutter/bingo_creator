@@ -6,7 +6,7 @@ from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 
-from constants import IMAGE_FOLDER, OUTPUT_PDF, NUM_CARDS, GRID_SIZE, VALID_EXTS
+from constants import IMAGE_FOLDER, OUTPUT_PATH, NUM_CARDS, GRID_SIZE, VALID_EXTS
 
 def get_image_paths(folder):
     files = [os.path.join(folder, f) for f in os.listdir(folder) if f.lower().endswith(VALID_EXTS)]
@@ -52,7 +52,7 @@ def generate_unique_cards(all_images, num_cards):
     print(f"Successfully generated {len(cards)} unique bingo cards (after {attempts} attempts).")
     return cards
 
-def create_pdf(cards, output_path):
+def create_pdf(cards, output_pdf):
     unique_paths = set()
     for card in cards:
         for row in card:
@@ -74,7 +74,7 @@ def create_pdf(cards, output_path):
         if idx % 10 == 0 or idx == len(unique_paths):
             print(f"   -> {idx}/{len(unique_paths)} images prepared...")
 
-    c = canvas.Canvas(output_path, pagesize=A4)
+    c = canvas.Canvas(output_pdf, pagesize=A4)
     page_width, page_height = A4
     # Layout
     margin = 10 * mm
@@ -113,11 +113,11 @@ def create_pdf(cards, output_path):
             print(f"   -> page {card_idx}/{len(cards)} created...")
         c.showPage()
     c.save()
-    print(f"PDF saved to: {output_path}")
+    print(f"PDF saved to: {output_pdf}")
 
 if __name__ == "__main__":
-    if IMAGE_FOLDER == "ENTER_PATH_HERE" or OUTPUT_PDF == "ENTER_PATH_HERE":
-        print("Error: Please set IMAGE_FOLDER and OUTPUT_PDF in constants.py")
+    if IMAGE_FOLDER == "ENTER_PATH_HERE" or OUTPUT_PATH == "ENTER_PATH_HERE":
+        print("Error: Please set IMAGE_FOLDER and OUTPUT_PATH in constants.py")
         exit()
     images = get_image_paths(IMAGE_FOLDER)
     if len(images) < 25:
@@ -125,4 +125,4 @@ if __name__ == "__main__":
     else:
         print(f"{len(images)} images found.")
         bingo_cards = generate_unique_cards(images, NUM_CARDS)
-        create_pdf(bingo_cards, OUTPUT_PDF)
+        create_pdf(bingo_cards, OUTPUT_PATH + "/bingo_cards.pdf")

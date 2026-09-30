@@ -1,5 +1,10 @@
 name: bingo_creator
 channels:
-  - default
+  - defaults
+  - conda-forge
 dependencies:
   - python=3.11
+  - pip
+  - pip:
+      - pillow
+      - reportlab
