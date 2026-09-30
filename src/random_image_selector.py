@@ -13,6 +13,9 @@ class BingoCallerFullscreen:
         self.root.configure(bg='black')
 
         # load and shuffle images
+        if IMAGE_FOLDER == "ENTER_PATH_HERE":
+            print("Error: Please set IMAGE_FOLDER in constants.py")
+            exit()
         self.images = [os.path.join(IMAGE_FOLDER, f) for f in os.listdir(IMAGE_FOLDER) 
                        if f.lower().endswith((".jpg", ".jpeg", ".png", ".webp"))]
         random.shuffle(self.images)

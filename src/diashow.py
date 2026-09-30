@@ -13,6 +13,10 @@ class BingoSlideshow:
         self.root.configure(bg='black')
 
         # load images
+        if not DIASHOW_IMAGE_FOLDER and IMAGE_FOLDER == "ENTER_PATH_HERE":
+            print("Error: Please set IMAGE_FOLDER or DIASHOW_IMAGE_FOLDER in constants.py")
+            exit()
+
         image_folder = DIASHOW_IMAGE_FOLDER if DIASHOW_IMAGE_FOLDER else IMAGE_FOLDER
         self.all_images = [os.path.join(image_folder, f) for f in os.listdir(image_folder) 
                            if f.lower().endswith((".jpg", ".jpeg", ".png", ".webp"))]

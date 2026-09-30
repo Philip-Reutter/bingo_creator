@@ -116,6 +116,9 @@ def create_pdf(cards, output_path):
     print(f"PDF saved to: {output_path}")
 
 if __name__ == "__main__":
+    if IMAGE_FOLDER == "ENTER_PATH_HERE" or OUTPUT_PDF == "ENTER_PATH_HERE":
+        print("Error: Please set IMAGE_FOLDER and OUTPUT_PDF in constants.py")
+        exit()
     images = get_image_paths(IMAGE_FOLDER)
     if len(images) < 25:
         print("Error: at least 25 images required")
