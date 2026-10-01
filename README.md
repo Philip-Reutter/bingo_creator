@@ -23,10 +23,10 @@ The repository features two dedicated presentation modes: an interactive **Bingo
 
 ## How to Use
 
+- **Configure Settings:** Edit `src/constants.py` to set image folder locations, slideshow speed, or card dimensions.
 - **Generate Cards:** Run `python src/card_creator.py` to process images and build formatted Bingo cards.
 - **Host Bingo Game (Manual Caller):** Run `python src/random_image_selector.py` and use keyboard controls (`Space` / `Right Arrow` for next image, `Left Arrow` for previous, `Esc` to exit) to present drawn items at own pace.
 - **Run Slideshow (Auto):** Run `python src/diashow.py` to display all images endlessly in random order with a fixed delay between transitions (reshuffles automatically when all images have been shown).
-- **Configure Settings:** Edit `src/constants.py` to set image folder locations, slideshow speed, or card dimensions.
 
 ---
 
